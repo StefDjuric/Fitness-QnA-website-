@@ -5,6 +5,11 @@ export const navLinks = [
         key: "home",
     },
     {
+        label: "Questions",
+        href: "/",
+        key: "questions",
+    },
+    {
         label: "About",
         href: "/",
         key: "about",
