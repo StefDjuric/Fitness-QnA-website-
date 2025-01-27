@@ -4,11 +4,23 @@ import { navLinks } from "@/constants";
 import Link from "next/link";
 import Button from "../Button/Button";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
-function Navbar() {
+function Navbar(): React.ReactElement {
     const [isHamburgerOpen, setisHamburgerOpen] = useState(false);
     const [isSearchCliked, setIsSearchClicked] = useState(false);
+    const menuRef: any = useRef(null);
+
+    const closeOpenMenus = (event: Event): void => {
+        if (isHamburgerOpen && !menuRef.current?.contains(event.target)) {
+            setisHamburgerOpen(false);
+        }
+        if (isSearchCliked && !menuRef.current?.contains(event.target)) {
+            setIsSearchClicked(false);
+        }
+    };
+
+    document.addEventListener("mousedown", closeOpenMenus);
 
     const toggleHamburgerDropdown = (): void =>
         setisHamburgerOpen(!isHamburgerOpen);
@@ -38,7 +50,7 @@ function Navbar() {
                         type="search"
                         name=""
                         id=""
-                        placeholder="Search..."
+                        placeholder="Search questions ..."
                         className="border-2 border-gray-50 focus-visible:outline-none rounded-lg p-1"
                     />
                 </div>
@@ -66,7 +78,10 @@ function Navbar() {
                             height={24}
                         ></Image>
                     </div>
-                    <div className=" relative inline-block text-left">
+                    <div
+                        className=" relative inline-block text-left"
+                        onMouseDown={(event) => event.stopPropagation()}
+                    >
                         <Image
                             onClick={toggleHamburgerDropdown}
                             src={
@@ -77,46 +92,54 @@ function Navbar() {
                             alt=""
                             className=" inline-block cursor-pointer "
                         ></Image>
-                        <ul
-                            className={`${
-                                isHamburgerOpen
-                                    ? "translate-x-0"
-                                    : "translate-x-full"
-                            } flex fixed top-12 right-0  h-screen gap-8 w-[250px] z-50 bg-white shadow-lg flex-col items-start  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all ease-in-out duration-300`}
-                        >
-                            {navLinks.map((link) => (
-                                <Link
-                                    className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
-                                    href={link.href}
-                                    key={link.key}
-                                >
-                                    {link.label}
-                                </Link>
-                            ))}
-                        </ul>
+                        {isHamburgerOpen && (
+                            <ul
+                                ref={menuRef}
+                                className={`${
+                                    isHamburgerOpen
+                                        ? "translate-x-0"
+                                        : "translate-x-full"
+                                } flex fixed top-12 right-0  h-screen gap-8 w-[250px] z-50 bg-white shadow-lg flex-col items-start  regular-18 text-gray-50 hover:font-bold pb-1.5 transition-all ease-in-out duration-300`}
+                            >
+                                {navLinks.map((link) => (
+                                    <Link
+                                        className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
+                                        href={link.href}
+                                        key={link.key}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </ul>
+                        )}
                     </div>{" "}
                     {/* End of  hamburger menu */}
                 </div>{" "}
                 {/* End of mobile menu */}
             </nav>
-            <div
-                className={`fixed w-screen flex  gap-4 flex-col h-[50px] top-16 z-50  lg:hidden ${
-                    isSearchCliked ? "inline-block" : "hidden"
-                }`}
-            >
-                <input
-                    type="search"
-                    name=""
-                    id=""
-                    placeholder="Search..."
-                    className="mx-4 p-2 w-[95%] focus-visible:outline-none border-2 border-gray-50 rounded-lg"
-                />
-                <Button
-                    type={"button"}
-                    label={"Ask a question"}
-                    styling={"btn-dark-green"}
-                />
-            </div>
+            {/* Mobile search menu */}
+            {isSearchCliked && (
+                <div
+                    ref={menuRef}
+                    onMouseDown={(event) => event.stopPropagation()}
+                    className={`fixed w-screen flex  gap-4 flex-col h-[50px] top-16 z-50  lg:hidden ${
+                        isSearchCliked ? "inline-block" : "hidden"
+                    }`}
+                >
+                    <input
+                        type="search"
+                        name=""
+                        id=""
+                        placeholder="Search questions..."
+                        className="mx-4 p-2 w-[95%] focus-visible:outline-none border-2 border-gray-50 rounded-lg"
+                    />
+                    <Button
+                        type={"button"}
+                        label={"Ask a question"}
+                        styling={"btn-dark-green"}
+                    />
+                </div>
+            )}
         </>
     );
 }
