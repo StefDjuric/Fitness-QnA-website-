@@ -67,11 +67,12 @@ function Navbar(): React.ReactElement {
                     />
                 </div>
                 {/* Hamburger menu and search div */}
-                <div className="flexCenter gap-12 lg:hidden">
+                <div className="flexCenter gap-12 lg:hidden ">
                     <div className=" relative inline-block text-left ">
                         <Image
+                            ref={menuRef}
                             onClick={toggleSearchDropdown}
-                            className="hover:cursor-pointer inline-block"
+                            className="hover:cursor-pointer inline-block bruh"
                             src="magnifying-glass.svg"
                             alt="magnifying glass icon"
                             width={24}
@@ -83,6 +84,7 @@ function Navbar(): React.ReactElement {
                         onMouseDown={(event) => event.stopPropagation()}
                     >
                         <Image
+                            ref={menuRef}
                             onClick={toggleHamburgerDropdown}
                             src={
                                 isHamburgerOpen ? "xmark-solid.svg" : "menu.svg"
@@ -90,28 +92,26 @@ function Navbar(): React.ReactElement {
                             width={24}
                             height={24}
                             alt=""
-                            className=" inline-block cursor-pointer "
+                            className=" inline-block cursor-pointer bruh"
                         ></Image>
-                        {isHamburgerOpen && (
-                            <ul
-                                ref={menuRef}
-                                className={`${
-                                    isHamburgerOpen
-                                        ? "translate-x-0"
-                                        : "translate-x-full"
-                                } flex fixed top-12 right-0  h-screen gap-8 w-[250px] z-50 bg-white shadow-lg flex-col items-start  regular-18 text-gray-50 hover:font-bold pb-1.5 transition-all ease-in-out duration-300`}
-                            >
-                                {navLinks.map((link) => (
-                                    <Link
-                                        className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
-                                        href={link.href}
-                                        key={link.key}
-                                    >
-                                        {link.label}
-                                    </Link>
-                                ))}
-                            </ul>
-                        )}
+
+                        <ul
+                            className={`${
+                                isHamburgerOpen
+                                    ? "translate-x-0"
+                                    : "translate-x-full"
+                            } flex fixed top-12 right-0  h-screen gap-8 w-[250px] z-50 bg-white shadow-lg flex-col items-start  regular-18 text-gray-50 hover:font-bold pb-1.5 transition-all ease-in-out duration-300`}
+                        >
+                            {navLinks.map((link) => (
+                                <Link
+                                    className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
+                                    href={link.href}
+                                    key={link.key}
+                                >
+                                    {link.label}
+                                </Link>
+                            ))}
+                        </ul>
                     </div>{" "}
                     {/* End of  hamburger menu */}
                 </div>{" "}
