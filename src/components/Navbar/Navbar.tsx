@@ -20,7 +20,7 @@ function Navbar(): React.ReactElement {
         }
     };
 
-    document.addEventListener("mousedown", closeOpenMenus);
+    if (process.browser) document.addEventListener("mousedown", closeOpenMenus);
 
     const toggleHamburgerDropdown = (): void =>
         setisHamburgerOpen(!isHamburgerOpen);
