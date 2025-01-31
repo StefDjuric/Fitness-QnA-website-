@@ -1,6 +1,6 @@
 "use client";
 
-import { navLinks } from "@/constants";
+import { NAV_LINKS } from "@/constants";
 import Link from "next/link";
 import Button from "../Button/Button";
 import Image from "next/image";
@@ -31,11 +31,14 @@ function Navbar(): React.ReactElement {
     return (
         <>
             <nav className="flexBetween max-container padding-container relative z-30 py-5 ">
-                <Link href="/" className="font-bold text-2xl text-gray-90 ">
+                <Link
+                    href="/"
+                    className="font-bold text-2xl lg:text-3xl text-gray-90 "
+                >
                     <span className="text-green-900">Be</span>Lean.
                 </Link>
                 <ul className="hidden h-full gap-12 lg:flex">
-                    {navLinks.map((link) => (
+                    {NAV_LINKS.map((link) => (
                         <Link
                             className="flexCenter regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
                             href={link.href}
@@ -102,7 +105,7 @@ function Navbar(): React.ReactElement {
                                     : "translate-x-full"
                             } flex fixed top-12 right-0  h-screen gap-8 w-[250px] z-50 bg-white shadow-lg flex-col items-start  regular-18 text-gray-50 hover:font-bold pb-1.5 transition-all ease-in-out duration-300`}
                         >
-                            {navLinks.map((link) => (
+                            {NAV_LINKS.map((link) => (
                                 <Link
                                     className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
                                     href={link.href}
