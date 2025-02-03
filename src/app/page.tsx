@@ -4,6 +4,7 @@ import Button from "@/components/Button/Button";
 import poseImage from "../../public/pose.jpg";
 import helpImage from "../../public/help.jpg";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
     return (
@@ -23,20 +24,25 @@ export default function Home() {
                 </h1>
 
                 <div className="relative h-[200px] flexCenter w-[50%] flex-col gap-4 right-[-50%] md:top-[12%] md:right-[-55%] lg:top-[30%]">
-                    <Button
-                        type={"button"}
-                        styling={
-                            "btn-dark-green lg:hidden lg:w-[30%] lg:h-[40%]"
-                        }
-                        label={"Log in"}
-                    />
-                    <Button
-                        type={"button"}
-                        styling={
-                            "btn-white-text hover:bg-green-90 hover:text-white lg:w-[30%] lg:h-[40%]"
-                        }
-                        label={"Sign up"}
-                    />
+                    <Link href="/login">
+                        <Button
+                            type={"button"}
+                            styling={
+                                "btn-dark-green lg:hidden lg:w-[30%] lg:h-[40%]"
+                            }
+                            label={"Log in"}
+                        />
+                    </Link>
+
+                    <Link href="/signup" className="lg:w-[30%] lg:h-[40%]">
+                        <Button
+                            type={"button"}
+                            styling={
+                                "btn-white-text hover:bg-green-90 hover:text-white "
+                            }
+                            label={"Sign up"}
+                        />
+                    </Link>
                 </div>
             </section>
 

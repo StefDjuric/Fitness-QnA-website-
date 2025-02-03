@@ -58,16 +58,21 @@ function Navbar(): React.ReactElement {
                     />
                 </div>
                 <div className="hidden lg:flexBetween">
-                    <Button
-                        type={"button"}
-                        label={"Log in"}
-                        styling={"btn-dark-green"}
-                    />
-                    <Button
-                        type={"button"}
-                        label={"Sign up"}
-                        styling={"btn-white-text hover:font-bold "}
-                    />
+                    <Link href="/login">
+                        <Button
+                            type={"button"}
+                            label={"Log in"}
+                            styling={"btn-dark-green"}
+                        />
+                    </Link>
+
+                    <Link href="/signup">
+                        <Button
+                            type={"button"}
+                            label={"Sign up"}
+                            styling={"btn-white-text hover:font-bold "}
+                        />
+                    </Link>
                 </div>
                 {/* Hamburger menu and search div */}
                 <div className="flexCenter gap-12 lg:hidden ">
