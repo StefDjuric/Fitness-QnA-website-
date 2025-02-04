@@ -25,6 +25,6 @@ const answerSchema = new Schema(
 );
 
 const Answer =
-    mongoose.models["Answers"] || mongoose.model("Answer", answerSchema);
+    mongoose.models.Answers || mongoose.model("Answer", answerSchema);
 
 export default Answer;

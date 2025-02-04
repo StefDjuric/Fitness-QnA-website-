@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { MouseEventHandler } from "react";
 
 type ButtonProps = {
     type: "submit" | "button";

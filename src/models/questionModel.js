@@ -31,6 +31,6 @@ const questionSchema = new Schema(
 );
 
 const Question =
-    mongoose.models["Questions"] || mongoose.model("Question", questionSchema);
+    mongoose.models.Question || mongoose.model("Question", questionSchema);
 
 export default Question;

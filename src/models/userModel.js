@@ -19,10 +19,10 @@ const userSchema = new Schema(
             type: String,
             required: [true, "Please provide a password!"],
         },
-        avatar: {
-            type: String,
-            required: false,
-        },
+        // avatar: {
+        //     type: String,
+        //     required: false,
+        // },
         userQuestions: [
             {
                 type: Schema.Types.ObjectId,
@@ -45,6 +45,6 @@ const userSchema = new Schema(
     }
 );
 
-const User = mongoose.models["Users"] || mongoose.model("User", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default User;

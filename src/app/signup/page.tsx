@@ -1,9 +1,77 @@
-import React from "react";
+"use client";
+
+import React, { FormEvent, ReactElement, useState } from "react";
 import Link from "next/link";
 import GoogleImage from "../../../public/google.svg";
 import Button from "@/components/Button/Button";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
-function Signup() {
+function Signup(): ReactElement {
+    const router = useRouter();
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [user, setUser] = useState<{ [key: string]: string }>({
+        email: "",
+        password: "",
+        username: "",
+    });
+
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+    const onSignup = async (event: FormEvent): Promise<void> => {
+        event.preventDefault();
+
+        // Stops if validation fails
+        if (!validateForm()) {
+            return;
+        }
+        setIsLoading(true);
+
+        try {
+            const response = await axios.post("/api/users/signup", user);
+
+            console.log("Signed up successfully! ", response.data);
+
+            router.push("/login");
+        } catch (error: any) {
+            if (error.response?.data?.error === "email")
+                setErrors({ email: error.response.data.message });
+            else if (error.response?.data?.error === "username")
+                setErrors({ username: error.response.data.message });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const validateForm = (): boolean => {
+        const newErrors: { [key: string]: string } = {};
+
+        if (!user.email) {
+            newErrors.email = "Email is required.";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(user.email)) {
+            newErrors.email = "Invalid email adress.";
+        }
+
+        if (!user.username) {
+            newErrors.username = "Username is required.";
+        } else if (user.username.length < 3) {
+            newErrors.username = "Username must be at least 3 characters long.";
+        }
+
+        if (!user.password) {
+            newErrors.password = "Password is required.";
+        } else if (user.password.length < 6)
+            newErrors.password =
+                "Password should be at least 6 characters long.";
+
+        setErrors(newErrors);
+
+        // Returns true if no errors
+        return Object.keys(newErrors).length === 0;
+    };
+
     return (
         <div className="max-container w-full padding-container flexCenter h-screen my-40 lg:my-24">
             <div className="flex flex-col min-w-[300px] lg:min-w-[400px] gap-8 shadow-2xl rounded-lg p-12">
@@ -28,7 +96,7 @@ function Signup() {
                     <p className="text-gray-400">OR</p>
                     <div className="w-[45%] h-0.5 bg-gray-200"></div>
                 </div>
-                <form action="" className="flex flex-col">
+                <form onSubmit={onSignup} className="flex flex-col" noValidate>
                     <div className="flex flex-col gap-4 mb-5">
                         <label className="regular-18" htmlFor="email">
                             Email
@@ -36,9 +104,16 @@ function Signup() {
                         <input
                             type="email"
                             name="email"
-                            id=""
+                            id="email"
+                            value={user.email}
+                            onChange={(event) =>
+                                setUser({ ...user, email: event.target.value })
+                            }
                             className="rounded-lg border-2 border-green-90 px-2 py-1"
                         />
+                        {errors.email && (
+                            <span style={{ color: "red" }}>{errors.email}</span>
+                        )}
                     </div>
                     <div className="flex flex-col gap-4 mb-5">
                         <label className="regular-18" htmlFor="username">
@@ -47,9 +122,21 @@ function Signup() {
                         <input
                             type="text"
                             name="username"
-                            id=""
+                            id="username"
+                            value={user.username}
+                            onChange={(event) =>
+                                setUser({
+                                    ...user,
+                                    username: event.target.value,
+                                })
+                            }
                             className="rounded-lg border-2 border-green-90 px-2 py-1"
                         />
+                        {errors.username && (
+                            <span style={{ color: "red" }}>
+                                {errors.username}
+                            </span>
+                        )}
                     </div>
                     <div className="flex flex-col gap-4 mb-10">
                         <label className="regular-18" htmlFor="password">
@@ -58,12 +145,24 @@ function Signup() {
                         <input
                             type="password"
                             name="password"
-                            id=""
+                            id="password"
+                            value={user.password}
+                            onChange={(event) =>
+                                setUser({
+                                    ...user,
+                                    password: event.target.value,
+                                })
+                            }
                             className="rounded-lg border-2 border-green-90 px-2 py-1"
                         />
+                        {errors.password && (
+                            <span style={{ color: "red" }}>
+                                {errors.password}
+                            </span>
+                        )}
                     </div>
                     <Button
-                        label={"Sign up"}
+                        label={isLoading ? "Signing up..." : "Sign up"}
                         type={"submit"}
                         styling="btn-dark-green mb-8"
                     />
