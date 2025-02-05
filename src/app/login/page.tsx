@@ -3,8 +3,56 @@
 import Link from "next/link";
 import GoogleImage from "../../../public/google.svg";
 import Button from "@/components/Button/Button";
+import { FormEvent, ReactElement, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-function page() {
+function LoginPage(): ReactElement {
+    const [formData, setFormData] = useState<{ [key: string]: string }>({
+        emailOrUsername: "",
+        password: "",
+    });
+
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+
+    const validateForm = (): boolean => {
+        const newErrors: { [key: string]: string } = {};
+
+        if (!formData.emailOrUsername)
+            newErrors.emailOrUsername = "Email or username is required.";
+
+        if (!formData.password) newErrors.password = "Password is required.";
+
+        setErrors(newErrors);
+
+        // Returns true if no errors
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const onLogin = async (event: FormEvent): Promise<void> => {
+        event.preventDefault();
+
+        if (!validateForm()) return;
+
+        setIsLoading(true);
+
+        try {
+            const response = await axios.post("/api/users/login", formData);
+            console.log("Signed up successfully!");
+
+            router.push("/");
+        } catch (error: any) {
+            if (error.response?.data?.error === "emailOrUsername")
+                setErrors({ emailOrUsername: error.response.data.message });
+            else if (error.response?.data?.error === "password")
+                setErrors({ password: error.response.data.message });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className="max-container padding-container flexCenter h-screen w-full my-32 lg:my-24">
             <div className="flex flex-col min-w-[300px] lg:min-w-[400px] gap-8 shadow-2xl rounded-lg p-12">
@@ -30,7 +78,7 @@ function page() {
                     <p className="text-gray-400">OR</p>
                     <div className="w-[45%] h-0.5 bg-gray-200"></div>
                 </div>
-                <form className="flex flex-col" noValidate>
+                <form onSubmit={onLogin} className="flex flex-col" noValidate>
                     <div className="flex flex-col gap-4 mb-5">
                         <label htmlFor="email" className="regular-18">
                             Email or Username
@@ -39,8 +87,20 @@ function page() {
                             type="email"
                             name="email"
                             id="email"
+                            value={formData.emailOrUsername}
+                            onChange={(event) =>
+                                setFormData({
+                                    ...formData,
+                                    emailOrUsername: event.target.value,
+                                })
+                            }
                             className="rounded-lg px-2 py-1 border-green-90 border-2"
                         />
+                        {errors.emailOrUsername && (
+                            <span style={{ color: "red" }}>
+                                {errors.emailOrUsername}
+                            </span>
+                        )}
                     </div>
                     <div className="flex flex-col gap-4 mb-10">
                         <div className="flexBetween">
@@ -56,12 +116,24 @@ function page() {
                             type="password"
                             name="password"
                             id="password"
+                            value={formData.password}
+                            onChange={(event) =>
+                                setFormData({
+                                    ...formData,
+                                    password: event.target.value,
+                                })
+                            }
                             className="rounded-lg px-2 py-1 border-green-90 border-2"
                         />
+                        {errors.password && (
+                            <span style={{ color: "red" }}>
+                                {errors.password}
+                            </span>
+                        )}
                     </div>
                     <Button
                         type="submit"
-                        label="Log in"
+                        label={isLoading ? "Logging in..." : "Log in"}
                         styling="btn-dark-green mb-8"
                     />
                 </form>
@@ -76,4 +148,4 @@ function page() {
     );
 }
 
-export default page;
+export default LoginPage;

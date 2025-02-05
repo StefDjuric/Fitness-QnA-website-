@@ -10,7 +10,7 @@ const zodUserSchema = z.object({
     password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
     try {
         await connectDb();
         const reqBody = await request.json();
