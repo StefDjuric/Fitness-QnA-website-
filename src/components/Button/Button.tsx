@@ -6,11 +6,16 @@ type ButtonProps = {
     label: string;
     icon?: string;
     styling: string;
+    onClick?: MouseEventHandler<HTMLButtonElement>;
 };
 
-function Button({ type, label, styling, icon }: ButtonProps) {
+function Button({ type, label, styling, icon, onClick }: ButtonProps) {
     return (
-        <button className={`rounded-full flexCenter ${styling}`} type={type}>
+        <button
+            className={`rounded-full flexCenter ${styling}`}
+            type={type}
+            onClick={onClick}
+        >
             {icon && <Image src={icon} alt={label} width={24} height={24} />}
             {label}
         </button>

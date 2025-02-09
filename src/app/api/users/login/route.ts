@@ -23,7 +23,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                     error: "emailOrUsername",
                     message: "Invalid email or username.",
                 },
-                { status: 500 }
+                { status: 401 }
             );
         }
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                     error: "password",
                     message: "Password is not correct.",
                 },
-                { status: 400 }
+                { status: 401 }
             );
         }
 

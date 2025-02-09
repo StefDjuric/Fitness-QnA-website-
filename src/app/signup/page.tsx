@@ -6,6 +6,8 @@ import GoogleImage from "../../../public/google.svg";
 import Button from "@/components/Button/Button";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { signIn } from "next-auth/react";
+import { sign } from "crypto";
 
 function Signup(): ReactElement {
     const router = useRouter();
@@ -17,6 +19,21 @@ function Signup(): ReactElement {
         password: "",
         username: "",
     });
+
+    const handleGoogleSignIn = async () => {
+        setIsLoading(true);
+        try {
+            const result = await signIn("google", {
+                callbackUrl: "/",
+                redirect: true,
+            });
+        } catch (error) {
+            console.error("Failed to sign in with google.");
+            setErrors({ google: "Failed to sign in with google" });
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -34,7 +51,12 @@ function Signup(): ReactElement {
 
             console.log("Signed up successfully! ", response.data);
 
-            router.push("/login");
+            const result = await signIn("credentials", {
+                email: user.email,
+                password: user.password,
+                redirect: true,
+                callbackUrl: "/",
+            });
         } catch (error: any) {
             if (error.response?.data?.error === "email")
                 setErrors({ email: error.response.data.message });
@@ -83,13 +105,19 @@ function Signup(): ReactElement {
                 </div>
                 <div className="flexCenter">
                     <Button
-                        label={"Sign up with Google"}
+                        label={
+                            isLoading ? "Signing in..." : "Sign in with Google"
+                        }
                         type={"button"}
                         icon={GoogleImage}
                         styling={
                             "w-full border-solid border-2 py-4 px-8 border-green-90 bg-white gap-4 hover:text-white hover:bg-green-90"
                         }
+                        onClick={handleGoogleSignIn}
                     />
+                    {errors.google && (
+                        <span style={{ color: "red" }}>{errors.google}</span>
+                    )}
                 </div>
                 <div className="flexCenter gap-2">
                     <div className="w-[45%] h-0.5 bg-gray-200"></div>

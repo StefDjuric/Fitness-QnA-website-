@@ -6,6 +6,8 @@ import Button from "@/components/Button/Button";
 import { FormEvent, ReactElement, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { Span } from "next/dist/trace";
 
 function LoginPage(): ReactElement {
     const [formData, setFormData] = useState<{ [key: string]: string }>({
@@ -29,6 +31,23 @@ function LoginPage(): ReactElement {
 
         // Returns true if no errors
         return Object.keys(newErrors).length === 0;
+    };
+
+    const handleGoogleSignIn = async () => {
+        setIsLoading(true);
+        try {
+            const result = await signIn("google", {
+                callbackUrl: "/",
+                redirect: true,
+            });
+        } catch (error) {
+            console.error("Error signing in with Google:", error);
+            setErrors({
+                google: "Failed to sign in with Google. Please try again.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const onLogin = async (event: FormEvent): Promise<void> => {
@@ -65,13 +84,19 @@ function LoginPage(): ReactElement {
                 </div>
                 <div className="flexCenter">
                     <Button
-                        label={"Log in with Google"}
+                        label={
+                            isLoading ? "Loging in..." : "Log in with Google"
+                        }
                         type={"button"}
                         icon={GoogleImage}
                         styling={
                             "w-full border-solid border-2 py-4 px-8 border-green-90 bg-white gap-4 hover:text-white hover:bg-green-90"
                         }
+                        onClick={handleGoogleSignIn}
                     />
+                    {errors.google && (
+                        <span style={{ color: "red" }}>{errors.google}</span>
+                    )}
                 </div>
                 <div className="flexCenter gap-2">
                     <div className="w-[45%] h-0.5 bg-gray-200"></div>
