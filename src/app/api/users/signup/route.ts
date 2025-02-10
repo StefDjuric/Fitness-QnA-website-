@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/userModel.js";
 import bcryptjs from "bcryptjs";
 import { z } from "zod";
+import { sendEmail } from "@/helpers/mailer";
 
 const zodUserSchema = z.object({
     username: z.string().min(3, "Username must be at least 3 characters long."),
@@ -57,7 +58,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             email: email,
         });
 
-        await newUser.save();
+        const savedUser = await newUser.save();
+
+        await sendEmail({ email, emailType: "VERIFY", userId: savedUser._id });
 
         return NextResponse.json({
             message: "User registered successfully",

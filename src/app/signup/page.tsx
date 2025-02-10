@@ -7,7 +7,6 @@ import Button from "@/components/Button/Button";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { signIn } from "next-auth/react";
-import { sign } from "crypto";
 
 function Signup(): ReactElement {
     const router = useRouter();
@@ -51,12 +50,7 @@ function Signup(): ReactElement {
 
             console.log("Signed up successfully! ", response.data);
 
-            const result = await signIn("credentials", {
-                email: user.email,
-                password: user.password,
-                redirect: true,
-                callbackUrl: "/",
-            });
+            router.push("/verify-email");
         } catch (error: any) {
             if (error.response?.data?.error === "email")
                 setErrors({ email: error.response.data.message });

@@ -35,6 +35,10 @@ const userSchema = new Schema(
                 ref: "Answer",
             },
         ],
+        isVerified: {
+            type: Boolean,
+            default: false,
+        },
         forgotPasswordToken: String,
         forgotPasswordTokenExpiration: Date,
         verifyToken: String,
