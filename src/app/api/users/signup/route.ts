@@ -20,7 +20,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         const validationResult = zodUserSchema.safeParse(reqBody);
         if (!validationResult.success) {
             return NextResponse.json(
-                { error: validationResult.error.errors[0].message },
+                {
+                    error: validationResult.error.errors[0],
+                    message: validationResult.error.errors[0].message,
+                },
                 { status: 400 }
             );
         }

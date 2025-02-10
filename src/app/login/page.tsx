@@ -133,7 +133,9 @@ function LoginPage(): ReactElement {
                                 Password
                             </label>
                             <p className="regular-14 text-blue-600">
-                                <Link href="#">Forgot password?</Link>
+                                <Link href="/forgot-password">
+                                    Forgot password?
+                                </Link>
                             </p>
                         </div>
 
