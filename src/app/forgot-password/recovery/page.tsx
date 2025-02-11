@@ -15,19 +15,22 @@ function page() {
     const router = useRouter();
 
     const validateForm = (): boolean => {
-        if (!formData.password) setErrors({ password: "Password is required" });
+        const newErrors: { [key: string]: string } = {};
+        if (!formData.password) newErrors.password = "Password is required.";
         else if (formData.password.length < 6)
-            setErrors({
-                password: "Password must be six characters or longer.",
-            });
+            newErrors.password = "Password should be 6 characters or longer.";
         else if (formData.password !== formData.repeatPassword)
-            setErrors({ repeatPassword: "Passwords must match." });
+            newErrors.repeatPassword = "Passwords must match.";
 
-        return Object.keys(errors).length === 0;
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = async (event: FormEvent): Promise<void> => {
         event.preventDefault();
+
+        setErrors({});
 
         if (!validateForm()) return;
 
@@ -41,10 +44,13 @@ function page() {
 
             router.push("/login");
         } catch (error: any) {
+            const newErrors: { [key: string]: string } = {};
             if (error.response?.data?.error === "password")
-                setErrors({ password: error.response.data.message });
+                newErrors.password = error.response.data.message;
             else if (error.response?.data?.error === "user")
-                setErrors({ user: error.response.data.message });
+                newErrors.user = error.response.data.message;
+
+            setErrors(newErrors);
         }
     };
 
@@ -86,16 +92,16 @@ function page() {
                         </label>
                         <input
                             type="password"
-                            name="password"
-                            id="password"
+                            name="repeatPassword"
+                            id="repeatPassword"
                             className="rounded-lg border-2 border-green-90 px-2 py-1"
                             value={formData.repeatPassword}
-                            onChange={(event) =>
+                            onChange={(event) => {
                                 setFormData({
                                     ...formData,
                                     repeatPassword: event.target.value,
-                                })
-                            }
+                                });
+                            }}
                         />
                     </div>
                     {errors.repeatPassword && (

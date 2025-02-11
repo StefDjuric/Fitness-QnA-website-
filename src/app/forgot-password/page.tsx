@@ -9,20 +9,25 @@ function page() {
     const [formData, setFormData] = useState<{ [key: string]: string }>({
         email: "",
     });
-    const [error, setError] = useState<{ [key: string]: string }>({});
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const validateForm = (): boolean => {
+        const newErrors: { [key: string]: string } = {};
         if (!formData.email) {
-            setError({ email: "Email is required." });
+            newErrors.email = "Email is required.";
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(formData.email)) {
-            setError({ email: "Invalid Email address." });
+            newErrors.email = "Email is invalid.";
         }
 
-        return Object.keys(error).length === 0;
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
     };
 
     const onSendRecoveryMail = async (event: FormEvent): Promise<void> => {
         event.preventDefault();
+
+        setErrors({});
 
         if (!validateForm()) {
             return;
@@ -38,8 +43,11 @@ function page() {
 
             setMailSent(true);
         } catch (error: any) {
+            const newErrors: { [key: string]: string } = {};
             if (error.response?.data?.error === "email")
-                setError({ email: error.response.data.message });
+                newErrors.email = error.response.data.message;
+
+            setErrors(newErrors);
         }
     };
 
@@ -84,9 +92,12 @@ function page() {
                                     })
                                 }
                             />
-                            {error.email && (
-                                <span style={{ color: "red" }}>
-                                    {error.email}
+                            {errors.email && (
+                                <span
+                                    className="regular-18"
+                                    style={{ color: "red" }}
+                                >
+                                    {errors.email}
                                 </span>
                             )}
                             <Button

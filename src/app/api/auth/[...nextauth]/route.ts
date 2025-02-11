@@ -107,6 +107,7 @@ const nextAuthOptions: AuthOptions = {
                                 Math.random().toString(36).slice(-8),
                                 10
                             ),
+                            isVerified: true,
                         });
 
                         await newUser.save();
