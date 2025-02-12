@@ -66,3 +66,12 @@ export const SOCIALS = {
         { src: "youtube.svg", key: "youtube" },
     ],
 };
+
+export const PUBLIC_PATHS = [
+    "/",
+    "/login",
+    "/signup",
+    "/verify-email",
+    "/forgot-password",
+    "/forgot-password/recovery",
+];

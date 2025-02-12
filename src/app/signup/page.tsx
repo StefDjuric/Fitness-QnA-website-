@@ -23,7 +23,7 @@ function Signup(): ReactElement {
         setIsLoading(true);
         try {
             const result = await signIn("google", {
-                callbackUrl: "/",
+                callbackUrl: "/dashboard",
                 redirect: true,
             });
         } catch (error) {

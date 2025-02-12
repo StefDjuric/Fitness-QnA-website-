@@ -4,29 +4,65 @@ import { NAV_LINKS } from "@/constants";
 import Link from "next/link";
 import Button from "../Button/Button";
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 function Navbar(): React.ReactElement {
     const [isHamburgerOpen, setisHamburgerOpen] = useState(false);
     const [isSearchCliked, setIsSearchClicked] = useState(false);
-    const menuRef: any = useRef(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const router = useRouter();
 
-    const closeOpenMenus = (event: Event): void => {
-        if (isHamburgerOpen && !menuRef.current?.contains(event.target)) {
-            setisHamburgerOpen(false);
-        }
-        if (isSearchCliked && !menuRef.current?.contains(event.target)) {
-            setIsSearchClicked(false);
-        }
-    };
+    useEffect(() => {
+        async function checkAuth() {
+            try {
+                const response = await axios.get("/api/auth/check-auth");
 
-    if (process.browser) document.addEventListener("mousedown", closeOpenMenus);
+                setIsLoggedIn(response.data?.isLoggedIn);
+            } catch (error: any) {
+                setIsLoggedIn(false);
+            }
+        }
+
+        checkAuth();
+    }, []);
+
+    useEffect(() => {
+        const closeOpenMenus = (event: MouseEvent): void => {
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target as Node)
+            ) {
+                setisHamburgerOpen(false);
+                setIsSearchClicked(false);
+            }
+        };
+
+        document.addEventListener("mousedown", closeOpenMenus);
+        return () => document.removeEventListener("mousedown", closeOpenMenus);
+    }, []);
 
     const toggleHamburgerDropdown = (): void =>
         setisHamburgerOpen(!isHamburgerOpen);
 
     const toggleSearchDropdown = (): void =>
         setIsSearchClicked(!isSearchCliked);
+
+    const handleLogOut = async () => {
+        try {
+            const response = await axios.get("/api/users/logout");
+
+            console.log(response);
+
+            setIsLoggedIn(false);
+
+            router.push("/");
+        } catch (error: any) {
+            console.log(error);
+        }
+    };
 
     return (
         <>
@@ -58,27 +94,37 @@ function Navbar(): React.ReactElement {
                     />
                 </div>
                 <div className="hidden lg:flexBetween">
-                    <Link href="/login">
+                    {isLoggedIn ? (
                         <Button
                             type={"button"}
-                            label={"Log in"}
+                            label={"Log out"}
                             styling={"btn-dark-green"}
+                            onClick={handleLogOut}
                         />
-                    </Link>
+                    ) : (
+                        <>
+                            <Link href="/login">
+                                <Button
+                                    type={"button"}
+                                    label={"Log in"}
+                                    styling={"btn-dark-green"}
+                                />
+                            </Link>
 
-                    <Link href="/signup">
-                        <Button
-                            type={"button"}
-                            label={"Sign up"}
-                            styling={"btn-white-text hover:font-bold "}
-                        />
-                    </Link>
+                            <Link href="/signup">
+                                <Button
+                                    type={"button"}
+                                    label={"Sign up"}
+                                    styling={"btn-white-text hover:font-bold "}
+                                />
+                            </Link>
+                        </>
+                    )}
                 </div>
                 {/* Hamburger menu and search div */}
-                <div className="flexCenter gap-12 lg:hidden ">
+                <div className="flexCenter gap-12 lg:hidden " ref={menuRef}>
                     <div className=" relative inline-block text-left ">
                         <Image
-                            ref={menuRef}
                             onClick={toggleSearchDropdown}
                             className="hover:cursor-pointer inline-block bruh"
                             src="magnifying-glass.svg"
@@ -92,7 +138,6 @@ function Navbar(): React.ReactElement {
                         onMouseDown={(event) => event.stopPropagation()}
                     >
                         <Image
-                            ref={menuRef}
                             onClick={toggleHamburgerDropdown}
                             src={
                                 isHamburgerOpen ? "xmark-solid.svg" : "menu.svg"
@@ -128,8 +173,6 @@ function Navbar(): React.ReactElement {
             {/* Mobile search menu */}
             {isSearchCliked && (
                 <div
-                    ref={menuRef}
-                    onMouseDown={(event) => event.stopPropagation()}
                     className={`fixed w-screen flex  gap-4 flex-col h-[50px] top-16 z-50  lg:hidden ${
                         isSearchCliked ? "inline-block" : "hidden"
                     }`}

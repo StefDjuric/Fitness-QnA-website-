@@ -5,9 +5,10 @@ import GoogleImage from "../../../public/google.svg";
 import Button from "@/components/Button/Button";
 import { FormEvent, ReactElement, useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Span } from "next/dist/trace";
+import { PUBLIC_PATHS } from "@/constants";
 
 function LoginPage(): ReactElement {
     const [formData, setFormData] = useState<{ [key: string]: string }>({
@@ -18,6 +19,7 @@ function LoginPage(): ReactElement {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const validateForm = (): boolean => {
         const newErrors: { [key: string]: string } = {};
@@ -37,7 +39,7 @@ function LoginPage(): ReactElement {
         setIsLoading(true);
         try {
             const result = await signIn("google", {
-                callbackUrl: "/",
+                callbackUrl: "/dashboard",
                 redirect: true,
             });
         } catch (error) {
@@ -61,7 +63,17 @@ function LoginPage(): ReactElement {
             const response = await axios.post("/api/users/login", formData);
             console.log("Signed up successfully!");
 
-            router.push("/");
+            let redirectPath = searchParams.get("from");
+
+            if (
+                !redirectPath ||
+                PUBLIC_PATHS.some((publicPath) =>
+                    redirectPath?.startsWith(publicPath)
+                )
+            )
+                redirectPath = "/dashboard";
+
+            router.push(redirectPath);
         } catch (error: any) {
             if (error.response?.data?.error === "emailOrUsername")
                 setErrors({ emailOrUsername: error.response.data.message });
