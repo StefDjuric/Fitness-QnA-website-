@@ -21,6 +21,29 @@ export const NAV_LINKS = [
     },
 ];
 
+export const LOGGED_IN_NAVLINKS = [
+    {
+        label: "My profile",
+        href: "/profile",
+        key: "profile",
+    },
+    {
+        label: "Questions",
+        href: "/questions",
+        key: "questions",
+    },
+    {
+        label: "About",
+        href: "/about",
+        key: "about",
+    },
+    {
+        label: "Contact Us",
+        href: "/contact-us",
+        key: "contact_us",
+    },
+];
+
 // FOOTER SECTION
 export const FOOTER_LINKS = [
     {

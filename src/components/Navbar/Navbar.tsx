@@ -1,18 +1,19 @@
 "use client";
 
-import { NAV_LINKS } from "@/constants";
+import { LOGGED_IN_NAVLINKS, NAV_LINKS } from "@/constants";
 import Link from "next/link";
 import Button from "../Button/Button";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../Providers/AuthContextProvider";
 
 function Navbar(): React.ReactElement {
     const [isHamburgerOpen, setisHamburgerOpen] = useState(false);
     const [isSearchCliked, setIsSearchClicked] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const { isLoggedIn, setIsLoggedIn } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -27,7 +28,7 @@ function Navbar(): React.ReactElement {
         }
 
         checkAuth();
-    }, []);
+    }, [setIsLoggedIn]);
 
     useEffect(() => {
         const closeOpenMenus = (event: MouseEvent): void => {
@@ -74,15 +75,25 @@ function Navbar(): React.ReactElement {
                     <span className="text-green-900">Be</span>Lean.
                 </Link>
                 <ul className="hidden h-full gap-12 lg:flex">
-                    {NAV_LINKS.map((link) => (
-                        <Link
-                            className="flexCenter regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
-                            href={link.href}
-                            key={link.key}
-                        >
-                            {link.label}
-                        </Link>
-                    ))}
+                    {isLoggedIn
+                        ? LOGGED_IN_NAVLINKS.map((link) => (
+                              <Link
+                                  className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
+                                  href={link.href}
+                                  key={link.key}
+                              >
+                                  {link.label}
+                              </Link>
+                          ))
+                        : NAV_LINKS.map((link) => (
+                              <Link
+                                  className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
+                                  href={link.href}
+                                  key={link.key}
+                              >
+                                  {link.label}
+                              </Link>
+                          ))}
                 </ul>
                 <div className="hidden lg:flexCenter">
                     <input
@@ -155,15 +166,35 @@ function Navbar(): React.ReactElement {
                                     : "translate-x-full"
                             } flex fixed top-12 right-0  h-screen gap-8 w-[250px] z-50 bg-white shadow-lg flex-col items-start  regular-18 text-gray-50 hover:font-bold pb-1.5 transition-all ease-in-out duration-300`}
                         >
-                            {NAV_LINKS.map((link) => (
-                                <Link
-                                    className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
-                                    href={link.href}
-                                    key={link.key}
-                                >
-                                    {link.label}
-                                </Link>
-                            ))}
+                            {isLoggedIn
+                                ? LOGGED_IN_NAVLINKS.map((link) => (
+                                      <Link
+                                          className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
+                                          href={link.href}
+                                          key={link.key}
+                                      >
+                                          {link.label}
+                                      </Link>
+                                  ))
+                                : NAV_LINKS.map((link) => (
+                                      <Link
+                                          className="ml-4 mt-2  regular-18 text-gray-50 cursor-pointer hover:font-bold pb-1.5 transition-all"
+                                          href={link.href}
+                                          key={link.key}
+                                      >
+                                          {link.label}
+                                      </Link>
+                                  ))}
+                            {isLoggedIn ? (
+                                <Button
+                                    label="log out"
+                                    styling="btn-dark-green w-full mt-6"
+                                    type="button"
+                                    onClick={handleLogOut}
+                                />
+                            ) : (
+                                <></>
+                            )}
                         </ul>
                     </div>{" "}
                     {/* End of  hamburger menu */}
@@ -173,6 +204,7 @@ function Navbar(): React.ReactElement {
             {/* Mobile search menu */}
             {isSearchCliked && (
                 <div
+                    ref={menuRef}
                     className={`fixed w-screen flex  gap-4 flex-col h-[50px] top-16 z-50  lg:hidden ${
                         isSearchCliked ? "inline-block" : "hidden"
                     }`}

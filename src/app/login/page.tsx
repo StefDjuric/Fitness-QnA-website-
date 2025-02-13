@@ -7,7 +7,7 @@ import { FormEvent, ReactElement, useState } from "react";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Span } from "next/dist/trace";
+import { useAuth } from "@/components/Providers/AuthContextProvider";
 import { PUBLIC_PATHS } from "@/constants";
 
 function LoginPage(): ReactElement {
@@ -20,6 +20,7 @@ function LoginPage(): ReactElement {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { setIsLoggedIn } = useAuth();
 
     const validateForm = (): boolean => {
         const newErrors: { [key: string]: string } = {};
@@ -42,6 +43,8 @@ function LoginPage(): ReactElement {
                 callbackUrl: "/dashboard",
                 redirect: true,
             });
+
+            setIsLoggedIn(true);
         } catch (error) {
             console.error("Error signing in with Google:", error);
             setErrors({
@@ -64,6 +67,7 @@ function LoginPage(): ReactElement {
             console.log("Signed up successfully!");
 
             let redirectPath = searchParams.get("from");
+            setIsLoggedIn(true);
 
             if (
                 !redirectPath ||

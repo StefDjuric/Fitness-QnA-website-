@@ -7,11 +7,14 @@ import Button from "@/components/Button/Button";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { signIn } from "next-auth/react";
+import { useAuth } from "@/components/Providers/AuthContextProvider";
 
 function Signup(): ReactElement {
     const router = useRouter();
 
     const [isLoading, setIsLoading] = useState(false);
+
+    const { setIsLoggedIn } = useAuth();
 
     const [user, setUser] = useState<{ [key: string]: string }>({
         email: "",
@@ -26,6 +29,8 @@ function Signup(): ReactElement {
                 callbackUrl: "/dashboard",
                 redirect: true,
             });
+
+            setIsLoggedIn(true);
         } catch (error) {
             console.error("Failed to sign in with google.");
             setErrors({ google: "Failed to sign in with google" });
