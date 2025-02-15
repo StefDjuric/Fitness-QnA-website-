@@ -138,7 +138,7 @@ function Navbar(): React.ReactElement {
                         <Image
                             onClick={toggleSearchDropdown}
                             className="hover:cursor-pointer inline-block bruh"
-                            src="magnifying-glass.svg"
+                            src="/magnifying-glass.svg"
                             alt="magnifying glass icon"
                             width={24}
                             height={24}
@@ -151,7 +151,9 @@ function Navbar(): React.ReactElement {
                         <Image
                             onClick={toggleHamburgerDropdown}
                             src={
-                                isHamburgerOpen ? "xmark-solid.svg" : "menu.svg"
+                                isHamburgerOpen
+                                    ? "/xmark-solid.svg"
+                                    : "/menu.svg"
                             }
                             width={24}
                             height={24}
@@ -216,11 +218,13 @@ function Navbar(): React.ReactElement {
                         placeholder="Search questions..."
                         className="mx-4 p-2 w-[95%] focus-visible:outline-none border-2 border-gray-50 rounded-lg"
                     />
-                    <Button
-                        type={"button"}
-                        label={"Ask a question"}
-                        styling={"btn-dark-green"}
-                    />
+                    <Link href={"/questions/ask"}>
+                        <Button
+                            type={"button"}
+                            label={"Ask a question"}
+                            styling={"btn-dark-green"}
+                        />
+                    </Link>
                 </div>
             )}
         </>

@@ -83,10 +83,10 @@ export const FOOTER_CONTACT_INFO = {
 export const SOCIALS = {
     title: "Socials",
     links: [
-        { src: "facebook.svg", key: "facebook" },
-        { src: "instagram.svg", key: "instagram" },
-        { src: "x.svg", key: "twitter" },
-        { src: "youtube.svg", key: "youtube" },
+        { src: "/facebook.svg", key: "facebook" },
+        { src: "/instagram.svg", key: "instagram" },
+        { src: "/x.svg", key: "twitter" },
+        { src: "/youtube.svg", key: "youtube" },
     ],
 };
 

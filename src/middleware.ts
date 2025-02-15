@@ -41,5 +41,7 @@ export const config = {
         "/forgot-password/recovery",
         "/dashboard",
         "/dashboard/:path",
+        "/questions",
+        "/questions/:path",
     ],
 };
