@@ -45,7 +45,7 @@ function AskQuestion() {
                 formData
             );
             console.log(response);
-            router.push("/dashboard");
+            router.push("/questions");
         } catch (error: any) {
             console.error("Error submiting question.", error);
             if (error.response?.data?.error === "title")

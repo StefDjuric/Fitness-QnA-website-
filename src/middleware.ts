@@ -13,14 +13,16 @@ export function middleware(request: NextRequest) {
 
     const isPublicPath = PUBLIC_PATHS.includes(path);
 
+    const isQuestionsPath = path === "/questions";
+
     if (isAuthenticated) {
-        if (isPublicPath) {
+        if (isPublicPath && !isQuestionsPath) {
             return NextResponse.redirect(
                 new URL("/dashboard", request.nextUrl)
             );
         }
     } else {
-        if (!isPublicPath) {
+        if (!isPublicPath && !isQuestionsPath) {
             const redirectUrl = new URL("/login", request.nextUrl);
 
             redirectUrl.searchParams.set("from", path);

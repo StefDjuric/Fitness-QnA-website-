@@ -6,17 +6,17 @@ export const NAV_LINKS = [
     },
     {
         label: "Questions",
-        href: "/",
+        href: "/questions",
         key: "questions",
     },
     {
         label: "About",
-        href: "/",
+        href: "/about",
         key: "about",
     },
     {
         label: "Contact Us",
-        href: "/",
+        href: "/contact-us",
         key: "contact_us",
     },
 ];
@@ -97,4 +97,5 @@ export const PUBLIC_PATHS = [
     "/verify-email",
     "/forgot-password",
     "/forgot-password/recovery",
+    "/questions",
 ];
