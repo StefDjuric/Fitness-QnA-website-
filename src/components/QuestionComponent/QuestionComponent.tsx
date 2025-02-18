@@ -32,6 +32,22 @@ function QuestionComponent({ questionID }: AnswersProp) {
         questionID: questionID,
     });
 
+    useEffect(() => {
+        async function getQuestionById() {
+            try {
+                const response = await axios.get(
+                    `/api/users/questions/get-question?questionID=${questionID}`
+                );
+
+                setQuestion(response.data.question);
+            } catch (error: any) {
+                setErrors({ question: error.response?.data?.message });
+            }
+        }
+
+        getQuestionById();
+    }, []);
+
     const router = useRouter();
 
     const validateForm = (): boolean => {
@@ -71,7 +87,7 @@ function QuestionComponent({ questionID }: AnswersProp) {
 
     return (
         <>
-            <h1 className="bold-20">Title {questionID}</h1>
+            <h1 className="bold-20">{question?.title}</h1>
             <div className="flex gap-10">
                 <div className="flex flex-col text-center gap-2">
                     <button className="border-2 border-green-90 rounded-full p-2">
@@ -83,8 +99,10 @@ function QuestionComponent({ questionID }: AnswersProp) {
                         ></Image>
                     </button>
 
-                    <p className="regular-32">0</p>
-                    <button className="border-2 border-green-90 rounded-full p-2">
+                    <p className="regular-20 md:regular-32">
+                        {question?.upvotes}
+                    </p>
+                    <button className="border-2 border-green-90 rounded-full p-2 min-w-[45px] min-h-[45px]">
                         <Image
                             src="/chevron-down.svg"
                             alt="chevron down"
@@ -95,16 +113,20 @@ function QuestionComponent({ questionID }: AnswersProp) {
                 </div>
 
                 <div className="flex flex-col justify-between">
-                    <p className="regular-20">content</p>
+                    <p className="regular-12 md:regular-18">
+                        {question?.content}
+                    </p>
                     <p className="regular-12 text-gray-30">
-                        Posted by: username
+                        {question?.owner.username}
                     </p>
                 </div>
             </div>
 
             <div className="w-full h-0.5 bg-gray-200"></div>
 
-            <h4 className="regular-18">number of answers:</h4>
+            <h4 className="regular-18">
+                number of answers: {question?.answers.length}
+            </h4>
             <div className="flex flex-col gap-3">
                 <h5 className="regular-18">Your answer</h5>
                 <form
