@@ -10,6 +10,19 @@ const answerSchema = new Schema(
             type: Number,
             default: 0,
         },
+        votes: [
+            {
+                user: {
+                    type: Schema.Types.ObjectId,
+                    ref: "User",
+                },
+                voteType: {
+                    type: Number,
+                    enum: [1, 0, -1],
+                    default: 0,
+                },
+            },
+        ],
         owner: {
             type: Schema.Types.ObjectId,
             ref: "User",

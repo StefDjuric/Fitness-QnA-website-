@@ -16,6 +16,22 @@ interface Question {
         _id: string;
         username?: string;
     };
+    userVoteType: number;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+interface Answer {
+    _id: string;
+    content: string;
+    upvotes: number;
+    owner: {
+        _id: string;
+        username?: string;
+    };
+    questionAnswerOn?: {
+        _id: string;
+    };
     createdAt?: string;
     updatedAt?: string;
 }
@@ -26,11 +42,31 @@ type AnswersProp = {
 
 function QuestionComponent({ questionID }: AnswersProp) {
     const [question, setQuestion] = useState<Question>();
+    const [answers, setAnswers] = useState<Answer[]>([]);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [formData, setFormData] = useState<{ [key: string]: string }>({
         textValue: "",
         questionID: questionID,
     });
+    const [success, setSuccess] = useState<boolean>(false);
+    const [userVote, setUserVote] = useState<number>(0);
+
+    useEffect(() => {
+        async function getAnswers() {
+            try {
+                const response = await axios.get(
+                    `/api/users/answer/get-answers?questionID=${questionID}`
+                );
+                setAnswers(response.data.answers);
+            } catch (error: any) {
+                setErrors({
+                    server: "Unable to get the answers for this question!",
+                });
+            }
+        }
+
+        getAnswers();
+    }, [question, answers]);
 
     useEffect(() => {
         async function getQuestionById() {
@@ -40,6 +76,8 @@ function QuestionComponent({ questionID }: AnswersProp) {
                 );
 
                 setQuestion(response.data.question);
+                if (response.data.userVoteType !== undefined)
+                    setUserVote(response.data.userVoteType);
             } catch (error: any) {
                 setErrors({ question: error.response?.data?.message });
             }
@@ -73,7 +111,10 @@ function QuestionComponent({ questionID }: AnswersProp) {
                 formData
             );
 
-            router.push(`/questions/${questionID}`);
+            location.reload();
+
+            setSuccess(true);
+
             setFormData({ ...formData, textValue: "" });
         } catch (error: any) {
             if (error.response?.data?.error === "textValue")
@@ -85,29 +126,87 @@ function QuestionComponent({ questionID }: AnswersProp) {
         }
     };
 
+    const handleQuestionUpvote = async () => {
+        try {
+            const response = await axios.post("/api/users/upvote", {
+                questionID: questionID,
+            });
+
+            setQuestion((prevQuestion) => {
+                if (!prevQuestion) return prevQuestion;
+                return {
+                    ...prevQuestion,
+                    upvotes: response.data?.updatedUpvotes,
+                };
+            });
+
+            setUserVote(response.data.userVoteType);
+        } catch (error: any) {
+            setErrors({
+                upvote:
+                    error.response?.data?.message ||
+                    "Failed to upvote the question.",
+            });
+        }
+    };
+
+    const handleQuestionDownvote = async () => {
+        try {
+            const response = await axios.post("/api/users/downvote", {
+                questionID: questionID,
+            });
+
+            setQuestion((prevQuestion) => {
+                if (!prevQuestion) return;
+                return {
+                    ...prevQuestion,
+                    upvotes: response.data?.updatedUpvotes,
+                };
+            });
+
+            setUserVote(response.data?.userVoteType);
+        } catch (error: any) {
+            setErrors({
+                downvote:
+                    error.response?.data?.message ||
+                    "Failed to downvote the question.",
+            });
+        }
+    };
+
     return (
         <>
             <h1 className="bold-20">{question?.title}</h1>
             <div className="flex gap-10">
                 <div className="flex flex-col text-center gap-2">
-                    <button className="border-2 border-green-90 rounded-full p-2">
+                    <button
+                        onClick={handleQuestionUpvote}
+                        className={`border-2 ${
+                            userVote === 1 ? "bg-green-90" : ""
+                        } border-green-90 rounded-full p-2 min-w-[35px] min-h-[35px]`}
+                    >
                         <Image
                             src="/chevron-up.svg"
                             alt="chevron up"
-                            width={40}
-                            height={40}
+                            width={30}
+                            height={30}
                         ></Image>
                     </button>
 
                     <p className="regular-20 md:regular-32">
                         {question?.upvotes}
                     </p>
-                    <button className="border-2 border-green-90 rounded-full p-2 min-w-[45px] min-h-[45px]">
+                    <button
+                        onClick={handleQuestionDownvote}
+                        className={`border-2 ${
+                            userVote === -1 ? "bg-green-90" : ""
+                        } border-green-90 rounded-full p-2 min-w-[35px] min-h-[35px]`}
+                    >
                         <Image
                             src="/chevron-down.svg"
                             alt="chevron down"
-                            width={40}
-                            height={40}
+                            width={30}
+                            height={30}
                         ></Image>
                     </button>
                 </div>
@@ -157,19 +256,72 @@ function QuestionComponent({ questionID }: AnswersProp) {
                             {errors.user}
                         </span>
                     )}
-                    {errors.question && (
-                        <span className="text-red-500 regular-12">
-                            {errors.question}
-                        </span>
-                    )}
+                    {errors.question ||
+                        (errors.server && (
+                            <span className="text-red-500 regular-12">
+                                {errors.question}
+                            </span>
+                        ))}
                     <Button
                         type="submit"
                         label="Post your answer"
                         styling="btn-dark-green w-[50%] "
                     />
+                    {success && (
+                        <span className="text-green-500">
+                            Successfully posted a question
+                        </span>
+                    )}
                 </form>
 
                 <div className="w-full h-0.5 bg-gray-200"></div>
+
+                {/* User answers */}
+                {answers.length > 0 ? (
+                    answers.map((answer) => (
+                        <div key={answer._id} className="flex flex-col gap-2">
+                            <div className="flex gap-10">
+                                <div className="flex flex-col text-center ">
+                                    <button className="border-2 border-green-90 rounded-full p-2 min-w-[35px] min-h-[35px]">
+                                        <Image
+                                            src="/chevron-up.svg"
+                                            alt="chevron up"
+                                            width={30}
+                                            height={30}
+                                        ></Image>
+                                    </button>
+
+                                    <p className="regular-20 md:regular-32">
+                                        {answer?.upvotes}
+                                    </p>
+                                    <button className="border-2 border-green-90 rounded-full p-2 min-w-[35px] min-h-[35px]">
+                                        <Image
+                                            src="/chevron-down.svg"
+                                            alt="chevron down"
+                                            width={30}
+                                            height={30}
+                                        ></Image>
+                                    </button>
+                                </div>
+
+                                <div className="flex flex-col justify-between">
+                                    <p className="regular-12 md:regular-18">
+                                        {answer?.content}
+                                    </p>
+                                    <p className="regular-12 text-gray-30">
+                                        {answer?.owner.username}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="w-full h-0.5 bg-gray-200"></div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="bg-gray-200 flexCenter">
+                        <p className="regular-18">No answers found!</p>
+                    </div>
+                )}
             </div>
         </>
     );
