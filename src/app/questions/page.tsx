@@ -45,9 +45,8 @@ function Questions() {
             try {
                 setLoading(true);
                 const response = await axios.get(
-                    `/api/users/questions?page=${page}&limit=${limit}&sort=${sortBy}`
+                    `/api/users/questions?page=${page}&limit=${limit}&sortBy=${sortBy}`
                 );
-                console.log("API Response:", response.data);
                 setQuestions(response.data.questions);
                 setPagination(response.data.pagination);
                 setError("");
@@ -68,13 +67,15 @@ function Questions() {
         if (newPage < 1 || (pagination && newPage > pagination.totalPages))
             return;
 
-        router.push(`/questions?page=${newPage}&limit=${limit}&sort=${sortBy}`);
+        router.push(
+            `/questions?page=${newPage}&limit=${limit}&sortBy=${sortBy}`
+        );
     };
 
     const handleSortChange = (newSort: string) => {
         setSortBy(newSort);
 
-        router.push(`/questions?page=${page}&limit=${limit}&sort=${newSort}`);
+        router.push(`/questions?page=${page}&limit=${limit}&sortBy=${newSort}`);
     };
 
     return (
