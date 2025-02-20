@@ -32,6 +32,7 @@ interface Answer {
     questionAnswerOn?: {
         _id: string;
     };
+    userVoteType: number;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -50,6 +51,9 @@ function QuestionComponent({ questionID }: AnswersProp) {
     });
     const [success, setSuccess] = useState<boolean>(false);
     const [userVote, setUserVote] = useState<number>(0);
+    const [userAnswerVotes, setUserAnswerVotes] = useState<{
+        [key: string]: number;
+    }>({});
 
     useEffect(() => {
         async function getAnswers() {
@@ -58,6 +62,13 @@ function QuestionComponent({ questionID }: AnswersProp) {
                     `/api/users/answer/get-answers?questionID=${questionID}`
                 );
                 setAnswers(response.data.answers);
+
+                const voteMap: { [key: string]: number } =
+                    response.data.answers.forEach((answer: Answer) => {
+                        voteMap[answer._id] = answer.userVoteType || 0;
+                    });
+
+                setUserAnswerVotes(voteMap);
             } catch (error: any) {
                 setErrors({
                     server: "Unable to get the answers for this question!",
@@ -66,7 +77,7 @@ function QuestionComponent({ questionID }: AnswersProp) {
         }
 
         getAnswers();
-    }, [question, answers]);
+    }, [questionID]);
 
     useEffect(() => {
         async function getQuestionById() {
@@ -174,6 +185,57 @@ function QuestionComponent({ questionID }: AnswersProp) {
         }
     };
 
+    const handleAnswerUpvote = async (answerID: string) => {
+        try {
+            const response = await axios.post(
+                "/api/users/upvote/upvote-answer",
+                {
+                    answerID: answerID,
+                }
+            );
+
+            setAnswers((prevAnswers) =>
+                prevAnswers.map((answer) =>
+                    answer._id === answerID
+                        ? { ...answer, upvotes: response.data?.updatedUpvotes }
+                        : answer
+                )
+            );
+
+            setUserAnswerVotes((prev) => ({
+                ...prev,
+                [answerID]: response.data?.userAnswerVoteType,
+            }));
+        } catch (error: any) {
+            setErrors({ question: error.response?.data?.message });
+        }
+    };
+
+    const handleAnswerDownvote = async (answerID: string) => {
+        try {
+            const response = await axios.post(
+                "/api/users/downvote/downvote-answer",
+                {
+                    answerID: answerID,
+                }
+            );
+
+            setAnswers((prevAnswers) =>
+                prevAnswers.map((answer) =>
+                    answer._id === answerID
+                        ? { ...answer, upvotes: response.data?.updatedUpvotes }
+                        : answer
+                )
+            );
+
+            setUserAnswerVotes((prev) => ({
+                ...prev,
+                [answerID]: response.data?.userAnswerVoteType,
+            }));
+        } catch (error: any) {
+            setErrors({ question: error?.response?.data?.message });
+        }
+    };
     return (
         <>
             <h1 className="bold-20">{question?.title}</h1>
@@ -282,7 +344,16 @@ function QuestionComponent({ questionID }: AnswersProp) {
                         <div key={answer._id} className="flex flex-col gap-2">
                             <div className="flex gap-10">
                                 <div className="flex flex-col text-center ">
-                                    <button className="border-2 border-green-90 rounded-full p-2 min-w-[35px] min-h-[35px]">
+                                    <button
+                                        onClick={() =>
+                                            handleAnswerUpvote(answer._id)
+                                        }
+                                        className={`border-2 border-green-90 ${
+                                            userAnswerVotes[answer._id] === 1
+                                                ? "bg-green-90"
+                                                : ""
+                                        } rounded-full p-2 min -w-[35px] min-h-[35px]`}
+                                    >
                                         <Image
                                             src="/chevron-up.svg"
                                             alt="chevron up"
@@ -294,7 +365,16 @@ function QuestionComponent({ questionID }: AnswersProp) {
                                     <p className="regular-20 md:regular-32">
                                         {answer?.upvotes}
                                     </p>
-                                    <button className="border-2 border-green-90 rounded-full p-2 min-w-[35px] min-h-[35px]">
+                                    <button
+                                        onClick={() =>
+                                            handleAnswerDownvote(answer._id)
+                                        }
+                                        className={`border-2 border-green-90 ${
+                                            userAnswerVotes[answer._id] === -1
+                                                ? "bg-green-90"
+                                                : ""
+                                        } rounded-full p-2 min -w-[35px] min-h-[35px]`}
+                                    >
                                         <Image
                                             src="/chevron-down.svg"
                                             alt="chevron down"
