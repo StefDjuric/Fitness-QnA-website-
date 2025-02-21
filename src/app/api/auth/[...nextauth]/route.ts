@@ -6,7 +6,7 @@ import User from "@/models/userModel";
 import bcrypt from "bcryptjs";
 import { AuthOptions } from "next-auth";
 
-const nextAuthOptions: AuthOptions = {
+export const nextAuthOptions: AuthOptions = {
     providers: [
         GoogleProvider({
             clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
@@ -75,14 +75,32 @@ const nextAuthOptions: AuthOptions = {
     callbacks: {
         async jwt({ token, user, account, profile }) {
             if (user) {
-                (token.id = user.id), (token.username = user.name);
+                if (account?.provider === "google") {
+                    try {
+                        await connectDb();
+                        const dbUser = await User.findOne({
+                            email: user.email,
+                        });
+
+                        if (dbUser) {
+                            token.id = dbUser._id.toString();
+                            token.username = dbUser.username;
+                        }
+                    } catch (error) {
+                        console.error("Error fetching user from DB: ", error);
+                    }
+                } else {
+                    token.id = user.id;
+                    token.username = user.username;
+                }
             }
             return token;
         },
 
         async session({ session, token }) {
             if (session.user) {
-                session.user.name = token.name as string;
+                session.user.id = token.id as string;
+                session.user.name = token.username as string;
             }
 
             return session;
