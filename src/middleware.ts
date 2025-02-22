@@ -45,5 +45,7 @@ export const config = {
         "/dashboard/:path",
         "/questions",
         "/questions/:path",
+        "/my-profile",
+        "/my-profile/:path",
     ],
 };

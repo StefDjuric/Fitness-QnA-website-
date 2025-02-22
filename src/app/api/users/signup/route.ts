@@ -30,8 +30,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         const { username, password, email } = validationResult.data;
 
-        console.log(validationResult.data);
-
         if (await User.findOne({ email })) {
             return NextResponse.json(
                 {

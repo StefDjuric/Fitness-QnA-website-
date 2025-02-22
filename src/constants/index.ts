@@ -24,7 +24,7 @@ export const NAV_LINKS = [
 export const LOGGED_IN_NAVLINKS = [
     {
         label: "My profile",
-        href: "/profile",
+        href: "/my-profile",
         key: "profile",
     },
     {

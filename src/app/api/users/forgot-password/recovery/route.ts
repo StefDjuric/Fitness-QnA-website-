@@ -19,6 +19,8 @@ const zodSchema = zod
 
 export async function POST(request: NextRequest) {
     try {
+        await connectDb();
+
         const requestBody = await request.json();
 
         const validationResult = zodSchema.safeParse(requestBody);
