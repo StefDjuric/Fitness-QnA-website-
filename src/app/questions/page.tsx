@@ -39,13 +39,14 @@ function Questions() {
 
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
+    const query = searchParams.get("query");
 
     useEffect(() => {
         async function fetchQuestions() {
             try {
                 setLoading(true);
                 const response = await axios.get(
-                    `/api/users/questions?page=${page}&limit=${limit}&sortBy=${sortBy}`
+                    `/api/users/questions?page=${page}&limit=${limit}&sortBy=${sortBy}&query=${query}`
                 );
                 setQuestions(response.data.questions);
                 setPagination(response.data.pagination);
@@ -61,21 +62,23 @@ function Questions() {
         }
 
         fetchQuestions();
-    }, [page, limit, sortBy]);
+    }, [page, limit, sortBy, query]);
 
     const changePage = (newPage: number) => {
         if (newPage < 1 || (pagination && newPage > pagination.totalPages))
             return;
 
         router.push(
-            `/questions?page=${newPage}&limit=${limit}&sortBy=${sortBy}`
+            `/questions?page=${newPage}&limit=${limit}&sortBy=${sortBy}&query=${query}`
         );
     };
 
     const handleSortChange = (newSort: string) => {
         setSortBy(newSort);
 
-        router.push(`/questions?page=${page}&limit=${limit}&sortBy=${newSort}`);
+        router.push(
+            `/questions?page=${page}&limit=${limit}&sortBy=${newSort}&query=${query}`
+        );
     };
 
     return (

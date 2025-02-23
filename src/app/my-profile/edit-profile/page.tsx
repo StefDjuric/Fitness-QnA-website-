@@ -3,6 +3,7 @@ import { FormEvent, useState } from "react";
 import axios from "axios";
 import Button from "@/components/Button/Button";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/Providers/AuthContextProvider";
 
 function EditProfile() {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -13,6 +14,7 @@ function EditProfile() {
         password: "",
         confirmPassword: "",
     });
+    const { isLoggedIn, setIsLoggedIn } = useAuth();
 
     const router = useRouter();
 
@@ -103,6 +105,7 @@ function EditProfile() {
 
             if (response.data?.success) {
                 setSuccess({ email: "Email updated successfully." });
+                setIsLoggedIn(false);
                 router.push("/");
             }
         } catch (error: any) {
@@ -121,6 +124,7 @@ function EditProfile() {
 
             if (response.data?.success) {
                 setSuccess({ delete: "Successfully deleted your profile." });
+                setIsLoggedIn(false);
                 router.push("/");
             }
         } catch (error: any) {

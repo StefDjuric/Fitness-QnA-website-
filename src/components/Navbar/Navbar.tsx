@@ -14,6 +14,7 @@ function Navbar(): React.ReactElement {
     const [isSearchCliked, setIsSearchClicked] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const { isLoggedIn, setIsLoggedIn } = useAuth();
+    const [searchValue, setSearchValue] = useState<string>("");
     const router = useRouter();
 
     useEffect(() => {
@@ -65,6 +66,17 @@ function Navbar(): React.ReactElement {
         }
     };
 
+    const handleSearch = () => {
+        if (searchValue) return router.push(`/questions?query=${searchValue}`);
+        else return router.push("/");
+    };
+
+    const handleKeyPress = (event: { key: any }) => {
+        if (event.key === "Enter") {
+            return handleSearch();
+        }
+    };
+
     return (
         <>
             <nav className="flexBetween max-container padding-container relative z-30 py-5 ">
@@ -98,10 +110,11 @@ function Navbar(): React.ReactElement {
                 <div className="hidden lg:flexCenter">
                     <input
                         type="search"
-                        name=""
-                        id=""
+                        value={searchValue}
+                        onChange={(event) => setSearchValue(event.target.value)}
                         placeholder="Search questions ..."
                         className="border-2 border-gray-50 focus-visible:outline-none rounded-lg p-1"
+                        onKeyDown={handleKeyPress}
                     />
                 </div>
                 <div className="hidden lg:flexBetween">
@@ -213,16 +226,17 @@ function Navbar(): React.ReactElement {
                 >
                     <input
                         type="search"
-                        name=""
-                        id=""
+                        value={searchValue}
+                        onChange={(event) => setSearchValue(event.target.value)}
                         placeholder="Search questions..."
                         className="mx-4 p-2 w-[95%] focus-visible:outline-none border-2 border-gray-50 rounded-lg"
                     />
-                    <Link href={"/questions/ask"}>
+                    <Link href={`/questions?query=${searchValue}`}>
                         <Button
                             type={"button"}
-                            label={"Ask a question"}
-                            styling={"btn-dark-green"}
+                            label={"Search"}
+                            styling={"btn-dark-green w-[100%]"}
+                            onClick={handleSearch}
                         />
                     </Link>
                 </div>

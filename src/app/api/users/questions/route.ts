@@ -10,11 +10,25 @@ export async function GET(request: NextRequest) {
         const page = parseInt(url.searchParams.get("page") || "1");
         const sortBy = url.searchParams.get("sortBy") || "Newest";
         const limit = parseInt(url.searchParams.get("limit") || "10");
+        const query = url.searchParams.get("query");
         const skip = (page - 1) * limit;
         let pipeline = [];
 
+        const searchQuery =
+            query !== "null"
+                ? {
+                      $or: [
+                          { title: { $regex: query, $options: "i" } },
+                          { content: { $regex: query, $options: "i" } },
+                      ],
+                  }
+                : {};
+
         if (sortBy === "activity") {
             pipeline = [
+                {
+                    $match: searchQuery,
+                },
                 {
                     $addFields: {
                         answersCount: { $size: { $ifNull: ["$answers", []] } },
@@ -64,7 +78,7 @@ export async function GET(request: NextRequest) {
                 },
             ];
 
-            const total = await Question.countDocuments();
+            const total = await Question.countDocuments(searchQuery);
             const totalPages = Math.ceil(total / limit);
             const questions = await Question.aggregate(pipeline);
 
@@ -92,25 +106,47 @@ export async function GET(request: NextRequest) {
                 break;
         }
 
-        const total = await Question.countDocuments();
-        const totalPages = Math.ceil(total / limit);
+        if (query !== "null") {
+            const total = await Question.countDocuments(searchQuery);
+            const totalPages = Math.ceil(total / limit);
 
-        const questions = await Question.find()
-            .populate("owner", "username")
-            .sort(sortOptions)
-            .skip(skip)
-            .limit(limit);
+            const questions = await Question.find(searchQuery)
+                .populate("owner", "username")
+                .sort(sortOptions)
+                .skip(skip)
+                .limit(limit);
 
-        return NextResponse.json({
-            success: true,
-            questions,
-            pagination: {
-                total,
-                totalPages,
-                page,
-                skip,
-            },
-        });
+            return NextResponse.json({
+                success: true,
+                questions,
+                pagination: {
+                    total,
+                    totalPages,
+                    page,
+                    skip,
+                },
+            });
+        } else {
+            const total = await Question.countDocuments();
+            const totalPages = Math.ceil(total / limit);
+
+            const questions = await Question.find()
+                .populate("owner", "username")
+                .sort(sortOptions)
+                .skip(skip)
+                .limit(limit);
+
+            return NextResponse.json({
+                success: true,
+                questions,
+                pagination: {
+                    total,
+                    totalPages,
+                    page,
+                    skip,
+                },
+            });
+        }
     } catch (error: any) {
         return NextResponse.json(
             {
