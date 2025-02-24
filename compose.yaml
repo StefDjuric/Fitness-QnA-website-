@@ -1,0 +1,48 @@
+services:
+    web:
+        depends_on:
+            - mongo
+
+        environment:
+            - MONGO_URI=${MONGO_URI}
+            - TOKEN_SECRET=${TOKEN_SECRET}
+            - DOMAIN=${DOMAIN}
+            - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+            - NEXT_PUBLIC_GOOGLE_SECRET=${NEXT_PUBLIC_GOOGLE_SECRET}
+            - NEXT_PUBLIC_AUTH_SECRET=${NEXT_PUBLIC_AUTH_SECRET}
+            - NEXTAUTH_URL=${NEXTAUTH_URL}
+            - NODEMAILER_USER=${NODEMAILER_USER}
+            - NODEMAILER_PASSWORD=${NODEMAILER_PASSWORD}
+
+        build:
+            context: .
+            dockerfile: Dockerfile
+
+        ports:
+            - "3000:3000"
+
+        volumes:
+            - .:/app
+
+        develop:
+            watch:
+                - path: ./package.json
+                  action: rebuild
+                - path: ./next.config.js
+                  action: rebuild
+                - path: ./package-lock.json
+                  action: rebuild
+                - path: .
+                  target: /src/app
+                  action: sync
+    mongo:
+        image: mongo
+
+        ports:
+            - "27017:27017"
+
+        volumes:
+            - mongodb_data:/data/db
+
+volumes:
+    mongodb_data:
