@@ -6,7 +6,13 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+You can run with docker in terminal:
+
+```bash
+docker compose up
+```
+
+or just run the development server in terminal:
 
 ```bash
 npm run dev
